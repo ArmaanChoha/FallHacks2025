@@ -44,14 +44,18 @@ button:disabled{opacity:.6;cursor:not-allowed}
   border-radius: 50%;             /* 👈 makes a perfect circle */
   overflow: hidden; 
 }
-.layer{
+.layer {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   object-fit: contain;
-  display: none;
+  display: none;        /* hidden by default */
 }
+.layer.show {
+  display: block;       /* shown when toggled */
+}
+
 .layer.show{
   display: block;
 }
