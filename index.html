@@ -3,15 +3,23 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>PizzaScope</title>
+  <title>Slice of Fate</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <main class="container">
     <header>
-      <h1>🍕 PizzaScope</h1>
+      <h1>🍕 Slice of Fate</h1>
       <p>Pick your crust, flour, and toppings. Get your weekly horoscope.</p>
     </header>
+
+    <!-- Preview Section -->
+    <section class="card">
+      <h2>Preview</h2>
+      <div class="pizza-stage">
+        <img id="img-base" class="layer show" alt="Base pizza" />
+      </div>
+    </section>
 
     <section class="card">
       <h2>1) Choose your crust</h2>
@@ -57,25 +65,14 @@
 
     <div class="actions">
       <button id="read">🔮 Read my Weekly PizzaScope</button>
-      <button id="copy" class="secondary">📋 Copy result</button>
     </div>
 
     <section id="result" class="card hidden" aria-live="polite">
       <h2 id="headline">Your PizzaScope</h2>
       <p id="blurb"></p>
-      <div class="facts">
-        <div><strong>Lucky Slice:</strong> <span id="luckySlice">–</span></div>
-        <div><strong>Power Move:</strong> <span id="powerMove">–</span></div>
-        <div><strong>Lucky Number:</strong> <span id="luckyNumber">–</span></div>
-        <div><strong>Best Day:</strong> <span id="bestDay">–</span></div>
-      </div>
     </section>
 
-    <footer>
-      <small>Weekly result stays the same until next week (based on your picks).</small>
-    </footer>
   </main>
-
   <script src="index.js"></script>
 </body>
 </html>
