@@ -1,90 +1,79 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Calorie Tracker</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PizzaScope</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <main class="wrap">
+  <main class="container">
     <header>
-      <h1>Calorie Tracker 🧮</h1>
-      <p>Enter maintenance calories, add foods, and see if you’re over. If you are, we’ll estimate exercise time to offset it.</p>
+      <h1>🍕 PizzaScope</h1>
+      <p>Pick your crust, flour, and toppings. Get your weekly horoscope.</p>
     </header>
 
-    <section class="card grid" aria-label="Inputs">
-      <div class="row">
-        <div>
-          <label for="maintenance">Maintenance (kcal/day)</label>
-          <input id="maintenance" type="number" inputmode="numeric" placeholder="e.g., 2400" />
-        </div>
-
-        <div>
-          <label for="weight">Your weight</label>
-          <div class="inline">
-            <input id="weight" type="number" inputmode="decimal" placeholder="e.g., 70" />
-            <select id="units" aria-label="Units">
-              <option value="kg">kg</option>
-              <option value="lb">lb</option>
-            </select>
-          </div>
-        </div>
-
-        <div>
-          <label for="exercise">Exercise (MET ≈ intensity)</label>
-          <select id="exercise">
-            <option value="0">Choose an exercise…</option>
-            <option value="3.3">Walking (5 km/h) ~ 3.3 MET</option>
-            <option value="6.0">Jogging (8 km/h) ~ 6.0 MET</option>
-            <option value="9.8">Running (9.7 km/h) ~ 9.8 MET</option>
-            <option value="8.0">Jumping jacks ~ 8.0 MET</option>
-            <option value="8.0">Cycling (22–29 km/h) ~ 8.0 MET</option>
-            <option value="3.0">Yoga (gentle) ~ 3.0 MET</option>
-            <option value="10.0">HIIT (vigorous) ~ 10.0 MET</option>
-          </select>
-        </div>
-      </div>
-
-      <hr/>
-
-      <div class="row">
-        <div>
-          <label for="food">Food (approx calories)</label>
-          <select id="food">
-            <option value="0">Choose a food…</option>
-            <option value="285">Slice of pizza — 285 kcal</option>
-            <option value="260">Donut — 260 kcal</option>
-            <option value="365">Medium fries — 365 kcal</option>
-            <option value="540">Cheeseburger — 540 kcal</option>
-            <option value="300">Boba tea — 300 kcal</option>
-            <option value="300">Ice cream cup — 300 kcal</option>
-            <option value="110">Soda (355 ml) — 110 kcal</option>
-            <option value="530">Burrito — 530 kcal</option>
-            <option value="1000">Manav — 1000 kcal</option>
-          </select>
-        </div>
-
-        <div>
-          <label for="servings">Servings</label>
-          <input id="servings" type="number" inputmode="numeric" min="1" value="1" />
-        </div>
-
-        <div class="btns">
-          <button id="addFood">Add food</button>
-          <button id="clearLog" class="secondary">Clear</button>
-        </div>
+    <section class="card">
+      <h2>1) Choose your crust</h2>
+      <div class="choices">
+        <label><input type="radio" name="crust" value="Neapolitan" checked> Neapolitan</label>
+        <label><input type="radio" name="crust" value="New York"> New York</label>
+        <label><input type="radio" name="crust" value="Thin & Crispy"> Thin & Crispy</label>
+        <label><input type="radio" name="crust" value="Deep Dish"> Deep Dish</label>
+        <label><input type="radio" name="crust" value="Detroit"> Detroit</label>
+        <label><input type="radio" name="crust" value="Sicilian"> Sicilian</label>
       </div>
     </section>
 
-    <section class="card" aria-label="Log">
-      <div class="status">
-        <strong>Total today:</strong> <span id="total">0</span> kcal
-        <span id="maintNote"></span>
-      </div>
-      <div id="alert" class="hidden" role="status" aria-live="polite"></div>
-      <ul id="log" class="log"></ul>
+    <section class="card">
+      <h2>2) Choose your flour</h2>
+      <select id="flour">
+        <option>00</option>
+        <option>Whole Wheat</option>
+        <option>Gluten-Free</option>
+        <option>Sourdough</option>
+        <option>Cauliflower</option>
+        <option>Semolina</option>
+      </select>
     </section>
+
+    <section class="card">
+      <h2>3) Pick your toppings (multi-select)</h2>
+      <div class="choices grid">
+        <label><input type="checkbox" value="Pepperoni"> Pepperoni</label>
+        <label><input type="checkbox" value="Mushrooms"> Mushrooms</label>
+        <label><input type="checkbox" value="Pineapple"> Pineapple</label>
+        <label><input type="checkbox" value="Jalapeños"> Jalapeños</label>
+        <label><input type="checkbox" value="Olives"> Olives</label>
+        <label><input type="checkbox" value="Onions"> Onions</label>
+        <label><input type="checkbox" value="Chicken"> Chicken</label>
+        <label><input type="checkbox" value="Bacon"> Bacon</label>
+        <label><input type="checkbox" value="Basil"> Basil</label>
+        <label><input type="checkbox" value="Extra Cheese"> Extra Cheese</label>
+        <label><input type="checkbox" value="Anchovies"> Anchovies</label>
+        <label><input type="checkbox" value="Bell Peppers"> Bell Peppers</label>
+      </div>
+    </section>
+
+    <div class="actions">
+      <button id="read">🔮 Read my Weekly PizzaScope</button>
+      <button id="copy" class="secondary">📋 Copy result</button>
+    </div>
+
+    <section id="result" class="card hidden" aria-live="polite">
+      <h2 id="headline">Your PizzaScope</h2>
+      <p id="blurb"></p>
+      <div class="facts">
+        <div><strong>Lucky Slice:</strong> <span id="luckySlice">–</span></div>
+        <div><strong>Power Move:</strong> <span id="powerMove">–</span></div>
+        <div><strong>Lucky Number:</strong> <span id="luckyNumber">–</span></div>
+        <div><strong>Best Day:</strong> <span id="bestDay">–</span></div>
+      </div>
+    </section>
+
+    <footer>
+      <small>Weekly result stays the same until next week (based on your picks).</small>
+    </footer>
   </main>
 
   <script src="index.js"></script>
