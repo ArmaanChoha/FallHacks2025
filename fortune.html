@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Slice of Fate — Your Cosmic Reading</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link href="https://fonts.googleapis.com/css2?family=Antonio:wght@400;700&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#07070c; --ink:#e9f7ff; --muted:#93a4b5;
+      --neon1:#69f7ff; --neon2:#ff71f8; --neon3:#ffd166;
+      --edge:rgba(255,255,255,.16); --glass:rgba(255,255,255,.06);
+      --blur:16px; --radius:22px;
+      --shadow:0 12px 40px rgba(0,0,0,.5), inset 0 0 0 1px rgba(255,255,255,.08);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;color:var(--ink);
+      font-family:"Space Grotesk",system-ui,sans-serif;
+      background:
+        radial-gradient(1100px 800px at 15% -5%, rgba(105,247,255,.22), transparent 60%),
+        radial-gradient(1200px 900px at 85% 0%, rgba(255,113,248,.18), transparent 60%),
+        radial-gradient(900px 900px at 50% 120%, rgba(255,209,102,.14), transparent 55%),
+        var(--bg);
+    }
+    .wrap{max-width:1100px;margin: clamp(14px,2.5vw,40px) auto; padding: 20px;}
+    .brand{
+      display:flex;align-items:center;gap:16px;margin-bottom:16px;
+      background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.03));
+      border:1px solid var(--edge); border-radius:var(--radius);
+      padding:14px 18px; backdrop-filter: blur(var(--blur)); box-shadow:var(--shadow); position:relative;overflow:hidden;
+    }
+    .brand:before{
+      content:""; position:absolute; inset:-2px;
+      background: radial-gradient(600px 120px at 25% -10%, rgba(105,247,255,.18), transparent 60%),
+                  radial-gradient(800px 200px at 70% -20%, rgba(255,113,248,.22), transparent 60%);
+      mix-blend-mode:screen; pointer-events:none;
+    }
+    .logo{width:54px;height:54px;border-radius:50%;
+      background:conic-gradient(from 0deg,#ff5f6d,#ffc371,#69f7ff,#ff71f8,#ffd166,#ff5f6d);}
+    .logo::after{content:"🍕";display:grid;place-items:center;inset:0;position:absolute;font-size:28px}
+    .titles h1{margin:0;font:700 clamp(28px,4vw,48px)/1.05 "Antonio",sans-serif;text-shadow:0 0 16px rgba(105,247,255,.35)}
+    .titles p{margin:3px 0 0;color:var(--muted)}
+
+    .grid{display:grid;grid-template-columns: 330px 1fr; gap:20px}
+    @media(max-width:980px){.grid{grid-template-columns:1fr}}
+
+    /* Summary card */
+    .card{
+      background:var(--glass); border:1px solid var(--edge); border-radius:var(--radius);
+      box-shadow:var(--shadow); backdrop-filter: blur(var(--blur)); overflow:hidden; position:relative;
+    }
+    .card .hd{padding:14px 16px;border-bottom:1px solid var(--edge);
+      background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02))}
+    .card .hd h2{margin:0;font:700 18px/1 "Antonio",sans-serif;letter-spacing:.4px}
+    .card .bd{padding:16px}
+
+    .pizzaBadge{
+      display:grid; place-items:center;
+      margin:12px auto 16px; width:220px; aspect-ratio:1/1;
+      border-radius:50%; background: radial-gradient(60% 60% at 50% 50%, #0b0f1a, #07070c 70%);
+      box-shadow:0 30px 50px rgba(0,0,0,.5), inset 0 0 0 1px rgba(255,255,255,.08);
+      position:relative;
+    }
+    .pizzaBadge svg{width:88%; filter: drop-shadow(0 20px 40px rgba(0,0,0,.6))}
+    .pill{
+      display:inline-flex; align-items:center; gap:8px; padding:8px 10px;
+      border:1px solid var(--edge); border-radius:999px; background:rgba(255,255,255,.06);
+      margin:6px 6px 0 0; font-weight:600; color:var(--muted)
+    }
+
+    /* Reading sections */
+    .reading{display:grid; gap:20px}
+    .section{
+      background:var(--glass); border:1px solid var(--edge); border-radius:var(--radius);
+      box-shadow:var(--shadow); backdrop-filter: blur(var(--blur));
+      overflow:hidden; position:relative;
+    }
+    .section .head{
+      display:flex;gap:12px;align-items:center; padding:16px;border-bottom:1px solid var(--edge);
+      background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02))
+    }
+    .section .head h3{margin:0;font:700 18px "Antonio",sans-serif; letter-spacing:.5px}
+    .tag{font-size:12px;color:var(--muted); margin-left:auto}
+    .section .body{padding:18px; line-height:1.75}
+    .highlight{color:var(--neon3); text-shadow:0 0 8px rgba(255,209,102,.4); font-weight:700}
+    .glyph{font-size:18px;filter: drop-shadow(0 0 6px rgba(255,255,255,.2))}
+
+    .toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+    .btn{
+      appearance:none;border:none;cursor:pointer;
+      padding:12px 14px;border-radius:12px;font-weight:800; letter-spacing:.4px; text-transform:uppercase;
+      color:#001018; background:linear-gradient(90deg,var(--neon1),var(--neon2));
+      box-shadow:0 8px 20px rgba(0,0,0,.5), 0 0 20px rgba(105,247,255,.35);
+      transition: transform .15s ease, box-shadow .2s ease;
+    }
+    .btn:hover{transform:translateY(-1px)}
+    .btn.ghost{
+      background:linear-gradient(90deg,#182130,#0e1623); color:var(--ink);
+      border:1px solid var(--edge); box-shadow:var(--shadow)
+    }
+    .footerNote{color:var(--muted); margin-top:10px; font-size:12px}
+
+    .sep{
+      height:1px; background:linear-gradient(90deg, transparent, rgba(255,255,255,.2), transparent);
+      margin: 12px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="brand">
+      <div class="logo" aria-hidden="true"></div>
+      <div class="titles">
+        <h1>Slice of Fate</h1>
+        <p>Your Cosmic Reading, Baked Fresh</p>
+      </div>
+    </header>
+
+    <div class="grid">
+      <!-- LEFT: Summary + Mini Pizza -->
+      <aside class="card" id="summaryCard">
+        <div class="hd"><h2>Your Pizza Constellation</h2></div>
+        <div class="bd">
+          <div class="pizzaBadge">
+            <svg viewBox="0 0 1000 1000" aria-hidden="true">
+              <defs>
+                <radialGradient id="dough" cx="50%" cy="45%">
+                  <stop offset="0%" stop-color="#ffefc7"/>
+                  <stop offset="60%" stop-color="#f7d79a"/>
+                  <stop offset="100%" stop-color="#c58d48"/>
+                </radialGradient>
+                <radialGradient id="cheeseGrad" cx="45%" cy="40%">
+                  <stop offset="0%" stop-color="#fff6ba"/>
+                  <stop offset="100%" stop-color="#ffd166"/>
+                </radialGradient>
+                <radialGradient id="sauceGrad" cx="50%" cy="50%">
+                  <stop offset="0%" stop-color="#ff6b6b"/>
+                  <stop offset="100%" stop-color="#b33939"/>
+                </radialGradient>
+                <radialGradient id="pepperoniGrad" cx="50%" cy="50%">
+                  <stop offset="0%" stop-color="#ff7b7b"/>
+                  <stop offset="100%" stop-color="#a11"/>
+                </radialGradient>
+              </defs>
+              <ellipse cx="500" cy="870" rx="300" ry="50" fill="rgba(0,0,0,.35)"/>
+              <circle id="doughOuter" cx="500" cy="500" r="360" fill="url(#dough)"/>
+              <circle id="doughInner" cx="500" cy="500" r="320" fill="#f5d9a7"/>
+              <circle id="sauceLayer" cx="500" cy="500" r="300" fill="url(#sauceGrad)" opacity=".55"/>
+              <circle id="cheeseLayer" cx="500" cy="500" r="300" fill="url(#cheeseGrad)" opacity=".8"/>
+              <!-- pepperoni preview cluster (we'll reuse one topping only to avoid clutter) -->
+              <g id="mini-peps" opacity=".95">
+                <circle cx="520" cy="420" r="30" fill="url(#pepperoniGrad)"/>
+                <circle cx="600" cy="520" r="24" fill="url(#pepperoniGrad)"/>
+                <circle cx="430" cy="540" r="28" fill="url(#pepperoniGrad)"/>
+              </g>
+            </svg>
+          </div>
+
+          <div id="pillbox"></div>
+          <div class="toolbar">
+            <button class="btn" id="shareCard">Share Card</button>
+            <a class="btn ghost" href="index.html">Build Another</a>
+          </div>
+          <div class="footerNote">Same combo = same reading. Change any ingredient for fresh chaos.</div>
+        </div>
+      </aside>
+
+      <!-- RIGHT: Reading -->
+      <main class="reading" id="readingRoot">
+        <!-- Sections will be injected by JS -->
+      </main>
+    </div>
+  </div>
+
+  <script>
+    // ========= UTIL: Seeded RNG so same pizza → same reading =========
+    function hashString(str){
+      let h = 2166136261 >>> 0;
+      for(let i=0;i<str.length;i++){
+        h ^= str.charCodeAt(i);
+        h = Math.imul(h, 16777619);
+      }
+      return h >>> 0;
+    }
+    function RNG(seed){
+      let x = seed >>> 0;
+      return function(){
+        // xorshift32
+        x ^= x << 13; x >>>= 0;
+        x ^= x >> 17; x >>>= 0;
+        x ^= x << 5;  x >>>= 0;
+        return (x >>> 0) / 0xFFFFFFFF;
+      };
+    }
+    function pick(r, arr){ return arr[Math.floor(r()*arr.length)] }
+    function sampleN(r, arr, n){
+      const pool = arr.slice();
+      const out = [];
+      while(out.length<n && pool.length){
+        const idx = Math.floor(r()*pool.length);
+        out.push(pool.splice(idx,1)[0]);
+      }
+      return out;
+    }
+
+    // ========= Read Query =========
+    const q = new URLSearchParams(location.search);
+    const crust = q.get('crust') || 'thin';
+    const sauce = +(q.get('sauce') || 60);
+    const cheese = +(q.get('cheese') || 70);
+    const toppings = q.getAll('t') || [];
+
+    const seedStr = JSON.stringify({crust,sauce,cheese,toppings:toppings.slice().sort()});
+    const rnd = RNG(hashString(seedStr));
+
+    // ========= Summaries =========
+    const crustArchetype = {
+      thin: "Air Sign of Crispy Resolve",
+      pan: "Earth Sign of Comfort & Gravity",
+      stuffed: "Fire Sign of Hidden Indulgence",
+      cauli: "Water Sign of Reinvention"
+    };
+    const crustRing = { thin:330, pan:315, stuffed:300, cauli:325 };
+
+    const toppingTraits = {
+      pepperoni: ["bold impulses","spicy comebacks","red-flag awareness (the good kind)"],
+      mushroom:  ["quiet intuition","side-quest energy","forest brain"],
+      olive:     ["salty wit","mysterious DMs","Mediterranean plotting"],
+      onion:     ["honest tears","layered patience","well-timed clapbacks"],
+      pineapple: ["chaotic good aura","vacation brain","rule-breaking charm"],
+      pepper:    ["color-pop courage","vitamin confidence","group-project leadership"],
+      bacon:     ["main-character energy","forbidden luxury","side-quest gluttony"],
+      anchovy:   ["underground taste","unbothered aura","mariner mindset"]
+    };
+
+    // Sauce/Cheese elemental vibes
+    function elementBlend(saucePct, cheesePct){
+      // Map sauce→ heat, cheese→ comfort
+      const heat = saucePct/100, comfort = cheesePct/100;
+      const lanes = [
+        {k:"Comet Heat", d:"you spark first, think later"},
+        {k:"River Calm", d:"you time the tide perfectly"},
+        {k:"Sun Hearth", d:"you warm rooms without trying"},
+        {k:"Moon Chill", d:"you keep cool, even in chaos"},
+      ];
+      const tag = heat>0.66 ? "Comet Heat" : heat<0.33 ? "Moon Chill" : (comfort>0.66 ? "Sun Hearth" : "River Calm");
+      const desc = lanes.find(x=>x.k===tag).d;
+      return {tag,desc};
+    }
+
+    // Lucky lists
+    const omens = ["a free upgrade","the last slice","a strangely specific coupon","front-row seating","perfect parking","green lights only","a suspiciously kind email","exact change in your pocket"];
+    const numbers = [3,7,11,14,18,21,24,27,33,42,69,77,88];
+    const colors = ["Nebula Cheese","Pepperoni Red","Oven Ember","Midnight Marinara","Basil Neon","Galactic Dough","Pink Garlic","Deep Dish Gold"];
+
+    // ========= Render Summary Pills & Mini Pizza =========
+    function renderSummary(){
+      const pillbox = document.getElementById('pillbox');
+      pillbox.innerHTML = "";
+      const pills = [
+        `Crust: <strong>${crust}</strong>`,
+        `Sauce: <strong>${sauce}%</strong>`,
+        `Cheese: <strong>${cheese}%</strong>`,
+      ].concat(toppings.map(t=>`Topping: <strong>${t}</strong>`));
+      pills.forEach(html=>{
+        const el = document.createElement('span'); el.className='pill'; el.innerHTML = html; pillbox.appendChild(el);
+      });
+
+      // adjust ring & layers
+      document.getElementById('doughInner').setAttribute('r', crustRing[crust] ?? 320);
+      document.getElementById('sauceLayer').setAttribute('opacity', String(Math.max(0,Math.min(1, sauce/100))*0.75));
+      document.getElementById('cheeseLayer').setAttribute('opacity', String(Math.max(0,Math.min(1, cheese/100))*0.9));
+
+      // pepperoni hint only if pepperoni was chosen
+      document.getElementById('mini-peps').setAttribute('opacity', toppings.includes('pepperoni')? "1" : "0.18");
+    }
+
+    // ========= Compose Sections =========
+    function paragraph(...parts){ return parts.filter(Boolean).join(" ") }
+
+    function buildIntro(){
+      const arch = crustArchetype[crust] || "Wandering Sign of Improvisation";
+      const el = elementBlend(sauce,cheese);
+      const tTraits = toppings.length ? sampleN(rnd, toppings, Math.min(3,toppings.length)).map(t=>pick(rnd,toppingTraits[t]||["unexpected taste"])).join(", ") : "uncomplicated cravings";
+      const line = paragraph(
+        `Under the ${arch}, your slice charts a course through ${el.tag.toLowerCase()}.`,
+        `Tonight, ${el.desc}; tomorrow, destiny asks for seconds.`,
+        `Your toppings whisper: <span class="highlight">${tTraits}</span>.`
+      );
+      return {title:"The Oven Opens", icon:"🔥", body: line, tag:"Prelude"};
+    }
+
+    function buildLove(){
+      const verbs = ["text first","double-tap","ghost gently","say yes to coffee","steal a fry","share the last slice","walk away smiling"];
+      const advice = ["leave room for dessert","set a timer before overthinking","trust the warm read","ignore the cold take","let playlists do the flirting"];
+      const v = pick(rnd,verbs); const a = pick(rnd,advice);
+      const line = paragraph(
+        `Romance rises like dough.`,
+        `If they mention your favorite topping, ${v}.`,
+        `If they judge your crust, ${pick(rnd,["laugh it off","be unbothered","offer them ranch"])}, then ${a}.`
+      );
+      return {title:"Matters of the Heart", icon:"💘", body: line, tag:"Love"};
+    }
+
+    function buildAmbition(){
+      const rewards = ["a quiet win","a public dub","unexpected praise","a perfect merge","a clean PR","a smooth deploy","standing ovation in a tiny room"];
+      const blockers = ["calendar chaos","tab overload","Wi-Fi gremlins","scope creep","phantom notifications","keyboard crumbs"];
+      const r = pick(rnd,rewards), b = pick(rnd,blockers);
+      const line = paragraph(
+        `Ambition preheats.`,
+        `Expect ${r} after you clear ${b}.`,
+        `Choose speed or craft, but not both before lunch.`,
+        `A meeting moved itself for you — take the hint.`
+      );
+      return {title:"Ambition & Loot", icon:"💼", body: line, tag:"Career"};
+    }
+
+    function buildChaos(){
+      const weird = [
+        "a stranger compliments your beverage temperature",
+        "you catch a falling item with impossible reflex",
+        "a sign misspells your name but it works",
+        "a playlist predicts your mood three songs in",
+        "a bird nods like it knows",
+        "the elevator arrives already empty and facing you"
+      ];
+      const omen = pick(rnd, omens);
+      const line = paragraph(
+        `Chaos Energy is playful today.`,
+        `Watch for ${pick(rnd,weird)}.`,
+        `When it happens, claim your reward: ${omen}.`
+      );
+      return {title:"Chaos Energy Report", icon:"🌀", body: line, tag:"Entropy"};
+    }
+
+    function buildWellness(){
+      const hyd = ["sip water dramatically","add a lemon slice like a main character","respect the nap window","stretch like you mean it","walk the long way, once"];
+      const tip = toppings.includes("anchovy") ? "salt seeks balance; hydrate twice." :
+                  toppings.includes("pineapple") ? "sweet seeks ground; breathe low and slow." :
+                  toppings.includes("bacon") ? "rich seeks rest; pick a gentler pace tonight." :
+                  pick(rnd, hyd);
+      const line = paragraph(
+        `Your body hears every choice.`,
+        `Today, ${tip}.`,
+        `Tomorrow, your future self leaves a thank-you note on the fridge.`
+      );
+      return {title:"Wellness & Recovery", icon:"🫧", body: line, tag:"Care"};
+    }
+
+    function buildLucky(){
+      const nums = sampleN(rnd, numbers, 5).join(" • ");
+      const col = pick(rnd, colors);
+      const hour = ["08:08","11:11","12:34","15:15","21:21","22:22"][Math.floor(rnd()*6)];
+      const line = paragraph(
+        `Lucky Numbers: <span class="highlight">${nums}</span>.`,
+        `Lucky Color: <span class="highlight">${col}</span>.`,
+        `Alignment Hour: <span class="highlight">${hour}</span>.`,
+        `Cabinet Oracle says: there is exactly one snack you forgot you owned.`
+      );
+      return {title:"Omens & Numbers", icon:"✨", body: line, tag:"Augury"};
+    }
+
+    const sections = [buildIntro, buildLove, buildAmbition, buildChaos, buildWellness, buildLucky];
+
+    function renderSections(){
+      const root = document.getElementById('readingRoot');
+      root.innerHTML = "";
+      sections.forEach(builder=>{
+        const {title, icon, body, tag} = builder();
+        const sec = document.createElement('section');
+        sec.className = 'section';
+        sec.innerHTML = `
+          <div class="head">
+            <div class="glyph">${icon}</div>
+            <h3>${title}</h3>
+            <div class="tag">${tag}</div>
+          </div>
+          <div class="body">
+            <p>${body}</p>
+            <div class="sep"></div>
+            <p>${pick(rnd,[
+              "If in doubt, reheat gently — second chances are tastier.",
+              "A text you send at the right minute changes the week.",
+              "Your patience is a superpower; deploy it like hot honey.",
+              "Tiny rituals make huge days.",
+              "Say the compliment out loud."
+            ])}</p>
+          </div>
+        `;
+        root.appendChild(sec);
+      });
+    }
+
+    // ========= Share (quick fallback uses print dialog for now) =========
+    document.getElementById('shareCard').addEventListener('click', ()=>{
+      // For now, use print UI; in next step I can add a canvas export shareable card
+      window.print();
+    });
+
+    renderSummary();
+    renderSections();
+  </script>
+</body>
+</html>

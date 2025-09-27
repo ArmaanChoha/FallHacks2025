@@ -2,95 +2,589 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Slice of Fate</title>
-  <link rel="stylesheet" href="style.css" />
+  <title>Slice of Fate — Build Your Pizza</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Antonio:wght@400;700&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ====== INSANE AESTHETIC: neon mystic pizza parlor x tarot ====== */
+    :root{
+      --bg:#07070c;
+      --ink:#e9f7ff;
+      --muted:#93a4b5;
+      --neon1:#69f7ff;
+      --neon2:#ff71f8;
+      --neon3:#ffd166;
+      --edge:rgba(255,255,255,.2);
+      --glass:rgba(255,255,255,.06);
+      --blur:14px;
+      --radius:22px;
+      --shadow:0 10px 30px rgba(0,0,0,.45), inset 0 0 0 1px rgba(255,255,255,.08);
+      --glow:0 0 24px var(--neon1), 0 0 48px var(--neon2);
+      --accent:#111925;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      background:
+        radial-gradient(1200px 800px at 15% 0%, rgba(105,247,255,.25), transparent 60%),
+        radial-gradient(1200px 900px at 85% 10%, rgba(255,113,248,.18), transparent 55%),
+        radial-gradient(900px 900px at 50% 120%, rgba(255,209,102,.18), transparent 55%),
+        var(--bg);
+      font-family: "Space Grotesk", system-ui, sans-serif;
+      color: var(--ink);
+      overflow-x:hidden;
+    }
+    .wrap{
+      max-width:1200px;
+      margin: clamp(16px, 2.5vw, 40px) auto;
+      padding: 20px;
+      display:grid;
+      grid-template-columns: 420px 1fr;
+      gap: 24px;
+      align-items:start;
+    }
+    @media (max-width: 980px){
+      .wrap{grid-template-columns: 1fr}
+    }
+
+    .brand{
+      grid-column: 1/-1;
+      display:flex;align-items:center;gap:16px;
+      padding: 14px 18px;
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
+      backdrop-filter: blur(var(--blur));
+      box-shadow: var(--shadow);
+      border: 1px solid var(--edge);
+      position:relative;
+      overflow:hidden;
+    }
+    .brand:before{
+      content:"";
+      position:absolute;inset:-2px;
+      background:
+        radial-gradient(600px 100px at 20% -10%, rgba(105,247,255,.18), transparent 60%),
+        radial-gradient(600px 160px at 70% -30%, rgba(255,113,248,.2), transparent 60%);
+      pointer-events:none;
+      mix-blend-mode:screen;
+    }
+    .logo{
+      width:52px;height:52px;border-radius:50%;
+      background:
+        conic-gradient(from 0deg,#ff5f6d,#ffc371,#69f7ff,#ff71f8,#ffd166,#ff5f6d);
+      box-shadow: 0 0 24px rgba(255,113,248,.6);
+      position:relative;
+      isolation:isolate;
+    }
+    .logo:after{
+      content:"🍕";
+      position:absolute;inset:0;display:grid;place-items:center;
+      font-size: 28px; filter: drop-shadow(0 2px 2px rgba(0,0,0,.45));
+    }
+    .titles{line-height:1}
+    .titles h1{
+      margin:0;font:700 clamp(28px,4vw,48px)/1.05 "Antonio",sans-serif;
+      letter-spacing:.5px;
+      text-shadow: 0 0 16px rgba(105,247,255,.4);
+    }
+    .titles p{margin:2px 0 0;color:var(--muted)}
+
+    .panel{
+      background: var(--glass);
+      border: 1px solid var(--edge);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(var(--blur));
+      position:relative;
+      overflow:hidden;
+    }
+    .panel .hd{
+      display:flex;align-items:center;justify-content:space-between;
+      padding: 16px 18px;border-bottom:1px solid var(--edge);
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+    }
+    .panel .hd h2{margin:0;font:700 18px/1 "Antonio",sans-serif;letter-spacing:.5px}
+    .panel .bd{padding: 16px 18px}
+
+    /* ===== Controls (sliders as “buttons”) ===== */
+    .section{margin-bottom:18px}
+    .section h3{
+      margin:0 0 10px;
+      font:600 14px/1 "Space Grotesk",sans-serif;
+      color: var(--muted);
+      letter-spacing:.4px;text-transform:uppercase;
+    }
+
+    .choices{
+      display:grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap:10px;
+    }
+    .chip{
+      position:relative;
+      border-radius: 14px;
+      padding: 12px 14px;
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      border:1px solid var(--edge);
+      cursor:pointer;user-select:none;
+      display:flex;align-items:center;gap:10px;
+      transition:.18s ease;
+    }
+    .chip:hover{transform: translateY(-1px); box-shadow: 0 8px 24px rgba(0,0,0,.35)}
+    .chip input{appearance:none;position:absolute;inset:0;opacity:0}
+    .dot{
+      width:18px;height:18px;border-radius:50%;
+      border:2px solid var(--neon1);
+      box-shadow: 0 0 10px rgba(105,247,255,.5);
+      background: radial-gradient(circle at 30% 30%, var(--neon1), transparent 60%);
+      transition:.2s ease;
+      flex:0 0 auto;
+    }
+    .chip input:checked + .dot{
+      border-color: var(--neon2);
+      background: radial-gradient(circle at 30% 30%, var(--neon2), transparent 60%);
+      box-shadow: 0 0 10px var(--neon2), 0 0 28px rgba(255,113,248,.5);
+    }
+    .chip span{font-weight:600}
+
+    /* Sliders styled as tactile “buttons” */
+    .sliderwrap{
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      border:1px solid var(--edge); border-radius: 14px; padding:10px 12px;
+    }
+    .sliderrow{display:grid;grid-template-columns: 120px 1fr 60px;gap:10px;align-items:center;margin:10px 0}
+    .sliderrow label{color:var(--muted);font-weight:600}
+    input[type=range]{
+      -webkit-appearance:none; appearance:none;width:100%;height:14px;
+      background:linear-gradient(90deg, var(--neon1), var(--neon2)); border-radius:99px;
+      outline:none; box-shadow: inset 0 0 0 2px rgba(255,255,255,.18), 0 0 24px rgba(105,247,255,.25);
+    }
+    input[type=range]::-webkit-slider-thumb{
+      -webkit-appearance:none; appearance:none;width:26px;height:26px;border-radius:50%;
+      background: radial-gradient(circle at 35% 35%, #fff, #c9f7ff 40%, #69f7ff 70%);
+      border: 2px solid #000; box-shadow: 0 2px 10px rgba(0,0,0,.45), 0 0 18px var(--neon1);
+      cursor:grab;
+    }
+    .val{
+      font-weight:700;color:var(--neon3);text-shadow:0 0 8px rgba(255,209,102,.4)
+    }
+
+    /* ===== Pizza Canvas ===== */
+    .stage{
+      aspect-ratio: 1 / 1;
+      width:100%;
+      display:grid;place-items:center;
+      background: radial-gradient(60% 60% at 50% 50%, #0b0f1a, #07070c 70%);
+      position:relative;
+    }
+    .pizza{
+      width:min(90%,520px);
+      filter: drop-shadow(0 30px 60px rgba(0,0,0,.55));
+    }
+    /* tooltip label */
+    .legend{
+      position:absolute;top:12px;left:12px;
+      background: rgba(0,0,0,.45);border:1px solid var(--edge);
+      padding:8px 12px;border-radius: 12px;backdrop-filter: blur(8px);
+      font-size:12px;color:var(--muted)
+    }
+
+    /* CTA footer */
+    .footer{
+      display:flex;gap:12px;flex-wrap:wrap;justify-content:flex-end;
+      padding: 14px 18px;border-top:1px solid var(--edge);
+      background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.06));
+    }
+    .btn{
+      appearance:none;border:none;cursor:pointer;
+      padding:12px 16px;border-radius:12px;font-weight:800;
+      letter-spacing:.4px;text-transform:uppercase;
+      color:#001018;background: linear-gradient(90deg, var(--neon1), var(--neon2));
+      box-shadow: 0 6px 16px rgba(0,0,0,.5), 0 0 20px rgba(105,247,255,.35);
+      transition: transform .15s ease, box-shadow .2s ease;
+    }
+    .btn:hover{transform: translateY(-1px); box-shadow: 0 10px 24px rgba(0,0,0,.55), 0 0 28px rgba(255,113,248,.4)}
+    .btn.secondary{
+      background: linear-gradient(90deg, #1a2636, #0f1722);
+      color:var(--ink); border:1px solid var(--edge);
+      box-shadow: var(--shadow);
+    }
+
+    /* mini helper grid on toppings */
+    .gridhint{position:absolute;inset:0;opacity:.05;pointer-events:none}
+  </style>
 </head>
 <body>
-  <main class="container">
-    <header>
-      <h1>🍕 Slice of Fate</h1>
-      <p>Pick your crust, flour, and toppings. Get your weekly horoscope.</p>
+  <div class="wrap">
+    <!-- Brand Header -->
+    <header class="brand">
+      <div class="logo"></div>
+      <div class="titles">
+        <h1>Slice of Fate</h1>
+        <p>Mystic pizza builder → cosmic horoscope</p>
+      </div>
     </header>
 
-    <!-- Preview Section -->
-    <section class="card">
-      <h2>Preview</h2>
-      <div class="pizza-stage">
-        <img id="img-base" class="layer show" alt="Base pizza" />
-      
-        <!-- already had these -->
-        <img data-top="Pepperoni"   class="layer top" alt="Pepperoni topping">
-        <img data-top="Mushrooms"   class="layer top" alt="Mushrooms topping">
-        <img data-top="Pineapple"   class="layer top" alt="Pineapple topping">
-        <img data-top="Olives"      class="layer top" alt="Olives topping">
-        <img data-top="Onions"      class="layer top" alt="Onions topping">
-        <img data-top="Jalapeños"   class="layer top" alt="Jalapeños topping">
-      
-        <!-- add these new ones -->
-        <img data-top="Chicken"     class="layer top" alt="Chicken topping">
-        <img data-top="Bacon"       class="layer top" alt="Bacon topping">
-        <img data-top="Basil"       class="layer top" alt="Basil topping">
-        <img data-top="Extra Cheese" class="layer top" alt="Extra Cheese topping">
-        <img data-top="Anchovies"   class="layer top" alt="Anchovies topping">
-        <img data-top="Bell Peppers" class="layer top" alt="Bell Peppers topping">
+    <!-- Controls Panel -->
+    <section class="panel">
+      <div class="hd"><h2>1 · Choose Your Base Magic</h2></div>
+      <div class="bd">
+        <div class="section">
+          <h3>Crust (toggle chips)</h3>
+          <div class="choices" id="crustChoices">
+            <label class="chip">
+              <input type="radio" name="crust" value="thin" checked>
+              <span class="dot"></span><span>Thin</span>
+            </label>
+            <label class="chip">
+              <input type="radio" name="crust" value="pan">
+              <span class="dot"></span><span>Pan</span>
+            </label>
+            <label class="chip">
+              <input type="radio" name="crust" value="stuffed">
+              <span class="dot"></span><span>Stuffed</span>
+            </label>
+            <label class="chip">
+              <input type="radio" name="crust" value="cauli">
+              <span class="dot"></span><span>Cauliflower</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="section">
+          <h3>Sauce + Cheese (sliders-as-buttons)</h3>
+          <div class="sliderwrap">
+            <div class="sliderrow">
+              <label for="sauce">Sauce</label>
+              <input id="sauce" type="range" min="0" max="100" value="60">
+              <div class="val" id="sauceVal">60%</div>
+            </div>
+            <div class="sliderrow">
+              <label for="cheese">Cheese</label>
+              <input id="cheese" type="range" min="0" max="100" value="70">
+              <div class="val" id="cheeseVal">70%</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h3>2 · Select Your Toppings (click to add to pizza)</h3>
+          <div class="choices" id="toppingChoices">
+            <label class="chip">
+              <input type="checkbox" value="pepperoni">
+              <span class="dot"></span><span>Pepperoni</span>
+            </label>
+            <label class="chip">
+              <input type="checkbox" value="mushroom">
+              <span class="dot"></span><span>Mushrooms</span>
+            </label>
+            <label class="chip">
+              <input type="checkbox" value="olive">
+              <span class="dot"></span><span>Olives</span>
+            </label>
+            <label class="chip">
+              <input type="checkbox" value="onion">
+              <span class="dot"></span><span>Onion</span>
+            </label>
+            <label class="chip">
+              <input type="checkbox" value="pineapple">
+              <span class="dot"></span><span>Pineapple</span>
+            </label>
+            <label class="chip">
+              <input type="checkbox" value="pepper">
+              <span class="dot"></span><span>Bell Pepper</span>
+            </label>
+            <label class="chip">
+              <input type="checkbox" value="bacon">
+              <span class="dot"></span><span>Bacon</span>
+            </label>
+            <label class="chip">
+              <input type="checkbox" value="anchovy">
+              <span class="dot"></span><span>Anchovies</span>
+            </label>
+          </div>
+        </div>
       </div>
-      
-      
-    </section>
-
-    <section class="card">
-      <h2>1) Choose your crust</h2>
-      <div class="choices">
-        <label><input type="radio" name="crust" value="Neapolitan" checked> Neapolitan</label>
-        <label><input type="radio" name="crust" value="New York"> New York</label>
-        <label><input type="radio" name="crust" value="Thin & Crispy"> Thin & Crispy</label>
-        <label><input type="radio" name="crust" value="Deep Dish"> Deep Dish</label>
-        <label><input type="radio" name="crust" value="Detroit"> Detroit</label>
-        <label><input type="radio" name="crust" value="Sicilian"> Sicilian</label>
+      <div class="footer">
+        <button class="btn secondary" id="reset">Reset</button>
+        <button class="btn" id="toHoroscope">Reveal My Fate</button>
       </div>
     </section>
 
-    <section class="card">
-      <h2>2) Choose your flour</h2>
-      <select id="flour">
-        <option>00</option>
-        <option>Whole Wheat</option>
-        <option>Gluten-Free</option>
-        <option>Sourdough</option>
-        <option>Cauliflower</option>
-        <option>Semolina</option>
-      </select>
-    </section>
+    <!-- Pizza Canvas Panel -->
+    <section class="panel">
+      <div class="hd"><h2>Live Pizza Preview</h2></div>
+      <div class="bd">
+        <div class="stage">
+          <div class="legend">Click toppings → they appear here</div>
 
-    <section class="card">
-      <h2>3) Pick your toppings (multi-select)</h2>
-      <div class="choices grid">
-        <label><input type="checkbox" value="Pepperoni"> Pepperoni</label>
-        <label><input type="checkbox" value="Mushrooms"> Mushrooms</label>
-        <label><input type="checkbox" value="Pineapple"> Pineapple</label>
-        <label><input type="checkbox" value="Jalapeños"> Jalapeños</label>
-        <label><input type="checkbox" value="Olives"> Olives</label>
-        <label><input type="checkbox" value="Onions"> Onions</label>
-        <label><input type="checkbox" value="Chicken"> Chicken</label>
-        <label><input type="checkbox" value="Bacon"> Bacon</label>
-        <label><input type="checkbox" value="Basil"> Basil</label>
-        <label><input type="checkbox" value="Extra Cheese"> Extra Cheese</label>
-        <label><input type="checkbox" value="Anchovies"> Anchovies</label>
-        <label><input type="checkbox" value="Bell Peppers"> Bell Peppers</label>
+          <!-- Optional faint grid overlay to look technical -->
+          <svg class="gridhint" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+            <defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse">
+              <path d="M10 0H0V10" fill="none" stroke="#fff" stroke-opacity=".6" stroke-width=".3"/>
+            </pattern></defs>
+            <rect width="100" height="100" fill="url(#grid)"></rect>
+          </svg>
+
+          <!-- SVG PIZZA -->
+          <svg class="pizza" viewBox="0 0 1000 1000">
+            <!-- Shadow -->
+            <ellipse cx="500" cy="870" rx="300" ry="50" fill="rgba(0,0,0,.35)"/>
+            <!-- Crust -->
+            <defs>
+              <radialGradient id="dough" cx="50%" cy="45%">
+                <stop offset="0%" stop-color="#ffefc7"/>
+                <stop offset="60%" stop-color="#f7d79a"/>
+                <stop offset="100%" stop-color="#c58d48"/>
+              </radialGradient>
+              <radialGradient id="cheeseGrad" cx="45%" cy="40%">
+                <stop offset="0%" stop-color="#fff6ba"/>
+                <stop offset="100%" stop-color="#ffd166"/>
+              </radialGradient>
+              <radialGradient id="sauceGrad" cx="50%" cy="50%">
+                <stop offset="0%" stop-color="#ff6b6b"/>
+                <stop offset="100%" stop-color="#b33939"/>
+              </radialGradient>
+            </defs>
+
+            <!-- Outer crust width changes with crust type by JS radius -->
+            <circle id="doughOuter" cx="500" cy="500" r="360" fill="url(#dough)"/>
+            <circle id="doughInner" cx="500" cy="500" r="320" fill="#f5d9a7"/>
+
+            <!-- Sauce + Cheese (alpha tied to sliders) -->
+            <circle id="sauceLayer" cx="500" cy="500" r="300" fill="url(#sauceGrad)" opacity=".6"/>
+            <circle id="cheeseLayer" cx="500" cy="500" r="300" fill="url(#cheeseGrad)" opacity=".8"/>
+
+            <!-- Toppings groups (visibility toggled) -->
+            <!-- Pepperoni -->
+            <g id="top-pepperoni" visibility="hidden">
+              <defs>
+                <radialGradient id="pepperoniGrad" cx="50%" cy="50%">
+                  <stop offset="0%" stop-color="#ff7b7b"/>
+                  <stop offset="100%" stop-color="#a11"/>
+                </radialGradient>
+              </defs>
+              <!-- 12 discs, scattered -->
+              <circle cx="500" cy="360" r="36" fill="url(#pepperoniGrad)"/>
+              <circle cx="620" cy="460" r="34" fill="url(#pepperoniGrad)"/>
+              <circle cx="400" cy="470" r="32" fill="url(#pepperoniGrad)"/>
+              <circle cx="560" cy="340" r="28" fill="url(#pepperoniGrad)"/>
+              <circle cx="450" cy="620" r="30" fill="url(#pepperoniGrad)"/>
+              <circle cx="550" cy="620" r="27" fill="url(#pepperoniGrad)"/>
+              <circle cx="370" cy="560" r="29" fill="url(#pepperoniGrad)"/>
+              <circle cx="640" cy="560" r="31" fill="url(#pepperoniGrad)"/>
+              <circle cx="500" cy="540" r="32" fill="url(#pepperoniGrad)"/>
+              <circle cx="720" cy="480" r="26" fill="url(#pepperoniGrad)"/>
+              <circle cx="300" cy="480" r="26" fill="url(#pepperoniGrad)"/>
+              <circle cx="520" cy="420" r="30" fill="url(#pepperoniGrad)"/>
+            </g>
+
+            <!-- Mushrooms -->
+            <g id="top-mushroom" visibility="hidden" fill="#c8b89b" stroke="#7c6b52" stroke-width="4">
+              <path d="M320 500 q40-80 120-60 q80-10 120 60 q-60 0 -120 0 q-60 0 -120 0 z"/>
+              <rect x="430" y="500" width="20" height="40" rx="6"/>
+              <path d="M560 380 q40-80 120-60 q80-10 120 60 q-60 0 -120 0 q-60 0 -120 0 z"/>
+              <rect x="670" y="380" width="20" height="40" rx="6"/>
+              <path d="M420 620 q40-80 120-60 q80-10 120 60 q-60 0 -120 0 q-60 0 -120 0 z"/>
+              <rect x="530" y="620" width="20" height="40" rx="6"/>
+            </g>
+
+            <!-- Olives -->
+            <g id="top-olive" visibility="hidden" fill="none" stroke="#0b0" stroke-width="10">
+              <circle cx="420" cy="420" r="16" stroke="#0a3"/>
+              <circle cx="600" cy="520" r="14" stroke="#0a3"/>
+              <circle cx="520" cy="580" r="12" stroke="#0a3"/>
+              <circle cx="360" cy="560" r="14" stroke="#0a3"/>
+              <circle cx="680" cy="460" r="16" stroke="#0a3"/>
+              <circle cx="470" cy="450" r="12" stroke="#0a3"/>
+            </g>
+
+            <!-- Onion rings -->
+            <g id="top-onion" visibility="hidden" fill="none" stroke="#d8a6ff" stroke-width="8" opacity=".9">
+              <circle cx="460" cy="430" r="18"/>
+              <circle cx="540" cy="430" r="12"/>
+              <circle cx="580" cy="520" r="20"/>
+              <circle cx="420" cy="550" r="16"/>
+              <circle cx="640" cy="500" r="12"/>
+            </g>
+
+            <!-- Pineapple chunks -->
+            <g id="top-pineapple" visibility="hidden" fill="#ffe27a" stroke="#b38b00" stroke-width="6">
+              <polygon points="520,360 550,370 540,400 510,390"/>
+              <polygon points="600,450 630,460 620,490 590,480"/>
+              <polygon points="420,500 450,510 440,540 410,530"/>
+              <polygon points="540,600 570,610 560,640 530,630"/>
+              <polygon points="380,440 410,450 400,480 370,470"/>
+            </g>
+
+            <!-- Bell peppers strips -->
+            <g id="top-pepper" visibility="hidden" fill="none" stroke="#5aff46" stroke-width="10" stroke-linecap="round">
+              <path d="M420 390 q30 10 60 0"/>
+              <path d="M470 520 q40 -10 80 6"/>
+              <path d="M560 470 q30 16 60 8"/>
+              <path d="M380 540 q50 14 90 0"/>
+              <path d="M610 560 q30 -8 70 2"/>
+            </g>
+
+            <!-- Bacon bits -->
+            <g id="top-bacon" visibility="hidden" stroke="#7b2b1a" stroke-width="12">
+              <path d="M430 420 q10 10 30 0" />
+              <path d="M520 380 q16 8 36 2" />
+              <path d="M600 520 q22 10 40 -4" />
+              <path d="M470 600 q22 -6 42 -10" />
+              <path d="M360 520 q16 6 32 2" />
+              <path d="M650 450 q18 8 34 -2" />
+            </g>
+
+            <!-- Anchovies -->
+            <g id="top-anchovy" visibility="hidden" fill="#7995b9" stroke="#31455f" stroke-width="3" opacity=".95">
+              <ellipse cx="470" cy="470" rx="36" ry="12"/>
+              <ellipse cx="560" cy="420" rx="36" ry="12"/>
+              <ellipse cx="600" cy="560" rx="36" ry="12"/>
+              <ellipse cx="420" cy="560" rx="36" ry="12"/>
+            </g>
+          </svg>
+        </div>
+      </div>
+      <div class="footer" style="justify-content:space-between">
+        <div style="color:var(--muted)">Tip: drag the sliders, then toggle toppings. Crust type changes the ring size.</div>
+        <div>
+          <button class="btn secondary" id="randomize">Random Pizza</button>
+        </div>
       </div>
     </section>
+  </div>
 
-    <div class="actions">
-      <button id="read">🔮 Read my Weekly PizzaScope</button>
-    </div>
+  <script>
+    // ====== STATE ======
+    const state = {
+      crust: 'thin',
+      sauce: 60,
+      cheese: 70,
+      toppings: new Set()
+    };
 
-    <section id="result" class="card hidden" aria-live="polite">
-      <h2 id="headline">Your PizzaScope</h2>
-      <p id="blurb"></p>
-    </section>
+    // ====== DOM ======
+    const sauce = document.getElementById('sauce');
+    const cheese = document.getElementById('cheese');
+    const sauceVal = document.getElementById('sauceVal');
+    const cheeseVal = document.getElementById('cheeseVal');
 
-  </main>
-  <script src="index.js"></script>
+    const groups = {
+      pepperoni: document.getElementById('top-pepperoni'),
+      mushroom: document.getElementById('top-mushroom'),
+      olive: document.getElementById('top-olive'),
+      onion: document.getElementById('top-onion'),
+      pineapple: document.getElementById('top-pineapple'),
+      pepper: document.getElementById('top-pepper'),
+      bacon: document.getElementById('top-bacon'),
+      anchovy: document.getElementById('top-anchovy'),
+    };
+
+    const doughOuter = document.getElementById('doughOuter');
+    const doughInner = document.getElementById('doughInner');
+    const sauceLayer = document.getElementById('sauceLayer');
+    const cheeseLayer = document.getElementById('cheeseLayer');
+
+    // ====== HELPERS ======
+    function setOpacity(el, pct){
+      const v = Math.max(0, Math.min(1, pct/100));
+      el.setAttribute('opacity', String(v));
+    }
+    function setCrust(type){
+      state.crust = type;
+      // Adjust crust ring thickness by varying inner radius
+      // Outer stays 360, inner is 320 by default (40px ring)
+      // Thin: inner 330 (30px ring), Pan: 315 (45px), Stuffed: 300 (60px), Cauli: 325
+      const map = { thin:330, pan:315, stuffed:300, cauli:325 };
+      const rInner = map[type] ?? 320;
+      doughInner.setAttribute('r', rInner);
+    }
+    function toggleTopping(key, on){
+      if(on) state.toppings.add(key); else state.toppings.delete(key);
+      groups[key].setAttribute('visibility', on ? 'visible' : 'hidden');
+    }
+    function syncSliders(){
+      sauceVal.textContent = sauce.value + '%';
+      cheeseVal.textContent = cheese.value + '%';
+      setOpacity(sauceLayer, +sauce.value);
+      setOpacity(cheeseLayer, +cheese.value);
+    }
+    function getSelections(){
+      return {
+        crust: state.crust,
+        sauce: state.sauce,
+        cheese: state.cheese,
+        toppings: Array.from(state.toppings)
+      };
+    }
+    function toFortune(){
+      const s = getSelections();
+      // Build query to the long-form horoscope page
+      const q = new URLSearchParams();
+      q.set('crust', s.crust);
+      q.set('sauce', s.sauce);
+      q.set('cheese', s.cheese);
+      s.toppings.forEach(t => q.append('t', t));
+      window.location.href = 'fortune.html?' + q.toString();
+    }
+    function resetAll(){
+      document.querySelector('input[name="crust"][value="thin"]').checked = true;
+      setCrust('thin');
+      sauce.value = 60; cheese.value = 70;
+      syncSliders();
+      Object.keys(groups).forEach(k=>{
+        const cb = document.querySelector(`#toppingChoices input[value="${k}"]`);
+        cb.checked = false;
+        toggleTopping(k, false);
+      });
+      state.toppings.clear();
+    }
+    function randomize(){
+      // Random crust
+      const crusts = ['thin','pan','stuffed','cauli'];
+      const c = crusts[Math.floor(Math.random()*crusts.length)];
+      document.querySelector(`input[name="crust"][value="${c}"]`).checked = true;
+      setCrust(c);
+
+      // Random sliders
+      sauce.value = Math.floor(20 + Math.random()*80);
+      cheese.value = Math.floor(20 + Math.random()*80);
+      syncSliders();
+
+      // Random toppings selection (2-6)
+      const keys = Object.keys(groups);
+      keys.forEach(k=>{
+        const cb = document.querySelector(`#toppingChoices input[value="${k}"]`);
+        const on = Math.random() < 0.5;
+        cb.checked = on;
+        toggleTopping(k, on);
+      });
+    }
+
+    // ====== WIRE EVENTS ======
+    document.getElementById('crustChoices').addEventListener('change', (e)=>{
+      const { name, value } = e.target;
+      if(name === 'crust'){ setCrust(value); }
+    });
+
+    sauce.addEventListener('input', ()=>{ state.sauce = +sauce.value; syncSliders(); });
+    cheese.addEventListener('input', ()=>{ state.cheese = +cheese.value; syncSliders(); });
+
+    document.getElementById('toppingChoices').addEventListener('change', (e)=>{
+      if(e.target && e.target.type === 'checkbox'){
+        toggleTopping(e.target.value, e.target.checked);
+      }
+    });
+
+    document.getElementById('toHoroscope').addEventListener('click', toFortune);
+    document.getElementById('reset').addEventListener('click', resetAll);
+    document.getElementById('randomize').addEventListener('click', randomize);
+
+    // init
+    setCrust('thin'); syncSliders();
+  </script>
 </body>
 </html>
