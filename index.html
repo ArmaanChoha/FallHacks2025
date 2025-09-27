@@ -1,50 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>GuiltTrip — 🍕 → 🏃 Minutes</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Calorie Tracker</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <main class="wrap">
     <header>
-      <h1>GuiltTrip 🍕 → 🏃</h1>
-      <p>Pick a food, pick an exercise, enter your weight. We’ll tell you the minutes. No shame, just math 😅</p>
+      <h1>Calorie Tracker 🧮</h1>
+      <p>Enter maintenance calories, add foods, and see if you’re over. If you are, we’ll estimate exercise time to offset it.</p>
     </header>
 
     <section class="card grid" aria-label="Inputs">
       <div class="row">
         <div>
-          <label for="food">Food (approx calories)</label>
-          <select id="food">
-            <option value="0">Choose a food…</option>
-            <option value="285">🍕 Slice of pizza — 285 kcal</option>
-            <option value="260">🍩 Donut — 260 kcal</option>
-            <option value="365">🍟 Medium fries — 365 kcal</option>
-            <option value="540">🍔 Cheeseburger — 540 kcal</option>
-            <option value="300">🧋 Boba tea — 300 kcal</option>
-            <option value="300">🍨 Ice cream cup — 300 kcal</option>
-            <option value="110">🥤 Soda (355 ml) — 110 kcal</option>
-            <option value="530">🌯 Burrito — 530 kcal</option>
-          </select>
+          <label for="maintenance">Maintenance (kcal/day)</label>
+          <input id="maintenance" type="number" inputmode="numeric" placeholder="e.g., 2400" />
         </div>
-        <div>
-          <label for="exercise">Exercise (MET ~ intensity)</label>
-          <select id="exercise">
-            <option value="0">Choose an exercise…</option>
-            <option value="3.3">🚶 Walking (5 km/h) — 3.3 MET</option>
-            <option value="6.0">🏃 Jogging (8 km/h) — 6.0 MET</option>
-            <option value="9.8">🏃‍♂️ Running (9.7 km/h) — 9.8 MET</option>
-            <option value="8.0">🧗 Jumping jacks — 8.0 MET</option>
-            <option value="8.0">🚴 Cycling (20–22 km/h) — 8.0 MET</option>
-            <option value="3.0">🧘 Yoga (gentle) — 3.0 MET</option>
-            <option value="10.0">🔥 HIIT (vigorous) — 10.0 MET</option>
-          </select>
-        </div>
-      </div>
 
-      <div class="row">
         <div>
           <label for="weight">Your weight</label>
           <div class="inline">
@@ -55,26 +30,63 @@
             </select>
           </div>
         </div>
+
         <div>
-          <label>&nbsp;</label>
-          <button id="calc" class="cta" type="button">Calculate ⏱️</button>
+          <label for="exercise">Exercise (MET ≈ intensity)</label>
+          <select id="exercise">
+            <option value="0">Choose an exercise…</option>
+            <option value="3.3">Walking (5 km/h) ~ 3.3 MET</option>
+            <option value="6.0">Jogging (8 km/h) ~ 6.0 MET</option>
+            <option value="9.8">Running (9.7 km/h) ~ 9.8 MET</option>
+            <option value="8.0">Jumping jacks ~ 8.0 MET</option>
+            <option value="8.0">Cycling (22–29 km/h) ~ 8.0 MET</option>
+            <option value="3.0">Yoga (gentle) ~ 3.0 MET</option>
+            <option value="10.0">HIIT (vigorous) ~ 10.0 MET</option>
+          </select>
         </div>
       </div>
 
-      <div class="result" aria-live="polite">
-        <div class="big" id="minutes">Pick options and hit Calculate</div>
-        <div id="quip" class="muted">We’ll use the standard formula: kcal/min ≈ (MET × 3.5 × weight_kg) / 200</div>
-        <div class="chips">
-          <span class="chip" id="kcalChip">Food: — kcal</span>
-          <span class="chip" id="metChip">Exercise: — MET</span>
-          <span class="chip" id="burnChip">Burn rate: — kcal/min</span>
+      <hr/>
+
+      <div class="row">
+        <div>
+          <label for="food">Food (approx calories)</label>
+          <select id="food">
+            <option value="0">Choose a food…</option>
+            <option value="285">Slice of pizza — 285 kcal</option>
+            <option value="260">Donut — 260 kcal</option>
+            <option value="365">Medium fries — 365 kcal</option>
+            <option value="540">Cheeseburger — 540 kcal</option>
+            <option value="300">Boba tea — 300 kcal</option>
+            <option value="300">Ice cream cup — 300 kcal</option>
+            <option value="110">Soda (355 ml) — 110 kcal</option>
+            <option value="530">Burrito — 530 kcal</option>
+            <option value="1000">Manav — 1000 kcal</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="servings">Servings</label>
+          <input id="servings" type="number" inputmode="numeric" min="1" value="1" />
+        </div>
+
+        <div class="btns">
+          <button id="addFood">Add food</button>
+          <button id="clearLog" class="secondary">Clear</button>
         </div>
       </div>
-      <div class="footer">Estimates only. Move the way you enjoy ✨</div>
+    </section>
+
+    <section class="card" aria-label="Log">
+      <div class="status">
+        <strong>Total today:</strong> <span id="total">0</span> kcal
+        <span id="maintNote"></span>
+      </div>
+      <div id="alert" class="hidden" role="status" aria-live="polite"></div>
+      <ul id="log" class="log"></ul>
     </section>
   </main>
 
-  <!-- IMPORTANT: filename is index.js to match your setup -->
-  <script src="index.js" defer></script>
+  <script src="index.js"></script>
 </body>
 </html>
