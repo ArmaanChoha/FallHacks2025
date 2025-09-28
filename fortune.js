@@ -1,5 +1,5 @@
 
-// ========= UTIL: Seeded RNG so same pizza → same reading =========
+// ========= UTIL: Seeded RNG so same pizza --> same reading =========
 function hashString(str){
   let h = 2166136261 >>> 0;
   for(let i=0;i<str.length;i++){
@@ -11,7 +11,7 @@ function hashString(str){
 function RNG(seed){
   let x = seed >>> 0;
   return function(){
-    // xorshift32
+    // Xorshift* algorithm
     x ^= x << 13; x >>>= 0;
     x ^= x >> 17; x >>>= 0;
     x ^= x << 5;  x >>>= 0;
@@ -61,7 +61,7 @@ const toppingTraits = {
 
 // Sauce/Cheese elemental vibes
 function elementBlend(saucePct, cheesePct){
-  // Map sauce→ heat, cheese→ comfort
+  // Map sauce to heat, cheese to comfort
   const heat = saucePct/100, comfort = cheesePct/100;
   const lanes = [
     {k:"Comet Heat", d:"you spark first, think later"},
@@ -217,9 +217,8 @@ function renderSections(){
   });
 }
 
-// ========= Share (quick fallback uses print dialog for now) =========
+// ========= Share  =========
 document.getElementById('shareCard').addEventListener('click', ()=>{
-  // For now, use print UI; in next step I can add a canvas export shareable card
   window.print();
 });
 

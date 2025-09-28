@@ -13,12 +13,11 @@ const sauceVal = document.getElementById('sauceVal');
 const cheeseVal = document.getElementById('cheeseVal');
 
 // ====== IMAGE STACK SETUP ======
-// In index.html, ensure: <div class="stage"><div id="imgStack"></div></div>
 const stack = document.getElementById('imgStack');
 function mk(id){
   const img = document.createElement('img');
   img.id = 'img-' + id;
-  img.hidden = true;                // start hidden; show when used
+  img.hidden = true;               
   img.style.position = 'absolute';
   img.style.inset = '0';
   img.style.width = '100%';
@@ -55,7 +54,7 @@ const BASE_IMAGE_BY_CRUST = {
 const TOPPING_SRC = {
   pepperoni: 'pictures/pepperoni.png',
   mushroom:  'pictures/mushroom.png',
-  olive:     'pictures/olives.png',     // rename key/file if needed
+  olive:     'pictures/olives.png',    
   onion:     'pictures/onions.png',
   pineapple: 'pictures/pineapple.png',
   pepper:    'pictures/bellpeppers.png',
@@ -63,7 +62,7 @@ const TOPPING_SRC = {
   anchovy:   'pictures/anchovies.png',
 };
 
-// Optional: separate overlay images for sauce/cheese shapes
+
 const SAUCE_IMG = 'pictures/sauce.png';
 const CHEESE_IMG = 'pictures/cheese.png';
 
@@ -171,6 +170,6 @@ document.getElementById('toHoroscope').addEventListener('click', toFortune);
 document.getElementById('reset').addEventListener('click', resetAll);
 document.getElementById('randomize').addEventListener('click', randomize);
 
-// ====== INIT ======
+
 setCrust('thin');
 syncSliders();
